@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+{% block title %}Prediction History{% endblock %}
+
+{% block content %}
+
+<section class="py-5">
+  <div class="container">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <div>
+        <h3 class="fw-bold mb-1">
+          <i class="fa-solid fa-clock-rotate-left text-warning me-2"></i>Prediction History
+        </h3>
+        <p class="text-muted mb-0">Last 20 predictions stored in your local database</p>
+      </div>
+      <a href="{{ url_for('index') }}" class="btn btn-predict px-4">
+        <i class="fa-solid fa-plus me-2"></i>New Prediction
+      </a>
+    </div>
+
+    {% if records %}
+
+      <!-- ── Summary Stats ──────────────────────────────── -->
+      <div class="row g-3 mb-4">
+        <div class="col-md-3">
+          <div class="stat-summary-card rounded-4 p-3 text-center">
+            <p class="text-muted small mb-1">Total Predictions</p>
+            <h3 class="fw-bold text-dark mb-0">{{ records | length }}</h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-summary-card rounded-4 p-3 text-center">
+            <p class="text-muted small mb-1">Avg Monthly Units</p>
+            <h3 class="fw-bold text-dark mb-0">
+              {{ "%.1f" | format(records | map(attribute='pred_units') | list | sum / records | length) }} kWh
+            </h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-summary-card rounded-4 p-3 text-center">
+            <p class="text-muted small mb-1">Avg Monthly Bill</p>
+            <h3 class="fw-bold text-dark mb-0">
+              ₹{{ "%.0f" | format(records | map(attribute='pred_bill') | list | sum / records | length) }}
+            </h3>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="stat-summary-card rounded-4 p-3 text-center">
+            <p class="text-muted small mb-1">Highest Bill</p>
+            <h3 class="fw-bold text-warning mb-0">
+              ₹{{ "%.0f" | format(records | map(attribute='pred_bill') | list | max) }}
+            </h3>
+          </div>
+        </div>
+      </div>
+
+      <!-- ── Table ──────────────────────────────────────── -->
+      <div class="card border-0 shadow-sm rounded-4 overflow-hidden">
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0" id="historyTable">
+            <thead class="table-dark">
+              <tr>
+                <th class="ps-4">#</th>
+                <th>Name</th>
+                <th>Season</th>
+                <th>AC (units/hrs)</th>
+                <th>Members</th>
+                <th class="text-center">Units (kWh)</th>
+                <th class="text-center">Bill (₹)</th>
+                <th class="text-center">Date</th>
+                <th class="text-center pe-4">Actions</th>
+              </tr>
+            </thead>
+            <tbody>
+              {% for r in records %}
+              <tr>
+                <td class="ps-4 text-muted">{{ loop.index }}</td>
+                <td class="fw-semibold">{{ r.name }}</td>
+                <td>
+                  {% if r.season == 'summer' %}<span class="badge bg-warning text-dark">☀️ Summer</span>
+                  {% elif r.season == 'winter' %}<span class="badge bg-info text-dark">❄️ Winter</span>
+                  {% else %}<span class="badge bg-primary">🌧️ Monsoon</span>{% endif %}
+                </td>
+                <td>{{ r.ac_units }} AC / {{ r.ac_hours }}h</td>
+                <td>
+                  <i class="fa-solid fa-user text-muted me-1"></i>{{ r.members }}
+                </td>
+                <td class="text-center">
+                  <span class="fw-semibold">{{ "%.1f" | format(r.pred_units) }}</span>
+                </td>
+                <td class="text-center">
+                  <span class="fw-bold text-success">₹{{ "%.0f" | format(r.pred_bill) }}</span>
+                </td>
+                <td class="text-center text-muted small">
+                  {{ r.created_at[:10] if r.created_at else '—' }}
+                </td>
+                <td class="text-center pe-4">
+                  <div class="d-flex gap-2 justify-content-center">
+                    <a href="{{ url_for('result', pred_id=r.id) }}"
+                       class="btn btn-sm btn-outline-primary rounded-pill">
+                      <i class="fa-solid fa-eye"></i>
+                    </a>
+                    <form action="{{ url_for('delete', pred_id=r.id) }}" method="POST"
+                          onsubmit="return confirmDelete(this)">
+                      <button type="submit" class="btn btn-sm btn-outline-danger rounded-pill">
+                        <i class="fa-solid fa-trash"></i>
+                      </button>
+                    </form>
+                  </div>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- ── Bar Chart ──────────────────────────────────── -->
+      {% if records | length > 1 %}
+      <div class="card border-0 shadow-sm rounded-4 mt-4">
+        <div class="card-body p-4">
+          <h5 class="fw-bold mb-3">
+            <i class="fa-solid fa-chart-bar text-warning me-2"></i>Bill Comparison Chart
+          </h5>
+          <canvas id="historyChart" style="max-height:280px;"></canvas>
+        </div>
+      </div>
+      {% endif %}
+
+    {% else %}
+      <!-- Empty State -->
+      <div class="text-center py-5">
+        <i class="fa-solid fa-folder-open fa-4x text-muted mb-3"></i>
+        <h5 class="text-muted">No predictions yet.</h5>
+        <p class="text-muted">Go back to the home page and make your first prediction!</p>
+        <a href="{{ url_for('index') }}" class="btn btn-predict px-4 mt-2">
+          <i class="fa-solid fa-bolt me-2"></i>Start Predicting
+        </a>
+      </div>
+    {% endif %}
+
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+{% if records | length > 1 %}
+<script>
+  const names  = {{ records | map(attribute='name') | list | tojson }};
+  const bills  = {{ records | map(attribute='pred_bill') | list | tojson }};
+  const units  = {{ records | map(attribute='pred_units') | list | tojson }};
+
+  const ctx = document.getElementById('historyChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: names,
+      datasets: [
+        {
+          label: 'Monthly Bill (₹)',
+          data: bills,
+          backgroundColor: 'rgba(245,158,11,0.75)',
+          borderColor: '#f59e0b',
+          borderWidth: 2,
+          borderRadius: 6,
+          yAxisID: 'y1',
+        },
+        {
+          label: 'Units (kWh)',
+          data: units,
+          backgroundColor: 'rgba(59,130,246,0.55)',
+          borderColor: '#3b82f6',
+          borderWidth: 2,
+          borderRadius: 6,
+          type: 'line',
+          yAxisID: 'y2',
+          tension: 0.3,
+          pointRadius: 5,
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: {
+        legend: { position: 'top' },
+        tooltip: {
+          callbacks: {
+            label: ctx => ctx.dataset.label.includes('₹')
+              ? ` ₹${ctx.parsed.y.toFixed(0)}`
+              : ` ${ctx.parsed.y.toFixed(1)} kWh`
+          }
+        }
+      },
+      scales: {
+        y1: { type: 'linear', position: 'left',  title: { display: true, text: 'Bill (₹)' } },
+        y2: { type: 'linear', position: 'right', title: { display: true, text: 'Units (kWh)' }, grid: { drawOnChartArea: false } }
+      }
+    }
+  });
+</script>
+{% endif %}
+{% endblock %}

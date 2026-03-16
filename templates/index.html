@@ -1,0 +1,252 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+
+{% block content %}
+
+<!-- ── Hero Section ────────────────────────────────────────────── -->
+<section class="hero-section py-5">
+  <div class="container py-3">
+    <div class="row align-items-center">
+      <div class="col-lg-6 text-white mb-4 mb-lg-0">
+        <span class="badge bg-warning text-dark fw-semibold px-3 py-2 mb-3 rounded-pill">
+          <i class="fa-solid fa-microchip me-1"></i>AI-Powered Prediction
+        </span>
+        <h1 class="display-5 fw-bold lh-sm mb-3">
+          Know Your Electricity Bill<br>
+          <span class="text-warning">Before It Arrives</span>
+        </h1>
+        <p class="lead text-light opacity-75 mb-4">
+          Enter your household appliance usage and let our trained ML model predict
+          your monthly electricity consumption and bill — based on real
+          <strong class="text-warning">TSSPDCL Telangana tariff slabs</strong>.
+        </p>
+        <div class="d-flex flex-wrap gap-3">
+          <div class="stat-badge">
+            <i class="fa-solid fa-database text-warning me-2"></i>
+            <span>6,000+ training samples</span>
+          </div>
+          <div class="stat-badge">
+            <i class="fa-solid fa-chart-line text-warning me-2"></i>
+            <span>96.6% accuracy (R²)</span>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 text-center">
+        <div class="hero-illustration">
+          <i class="fa-solid fa-house-chimney-crack hero-icon"></i>
+          <div class="floating-badges">
+            <span class="floating-badge badge-ac"><i class="fa-solid fa-wind"></i> AC</span>
+            <span class="floating-badge badge-light"><i class="fa-solid fa-lightbulb"></i> Lights</span>
+            <span class="floating-badge badge-fridge"><i class="fa-solid fa-box"></i> Fridge</span>
+            <span class="floating-badge badge-wm"><i class="fa-solid fa-shirt"></i> W.M.</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── How It Works ─────────────────────────────────────────────── -->
+<section class="py-4 bg-light border-bottom">
+  <div class="container">
+    <div class="row g-3 text-center">
+      <div class="col-md-4">
+        <div class="step-card">
+          <div class="step-number">1</div>
+          <h6 class="fw-bold mt-2">Fill Your Details</h6>
+          <p class="text-muted small mb-0">Enter household size and appliance usage</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="step-card">
+          <div class="step-number">2</div>
+          <h6 class="fw-bold mt-2">AI Analyzes</h6>
+          <p class="text-muted small mb-0">Our RandomForest model processes your data</p>
+        </div>
+      </div>
+      <div class="col-md-4">
+        <div class="step-card">
+          <div class="step-number">3</div>
+          <h6 class="fw-bold mt-2">Get Results</h6>
+          <p class="text-muted small mb-0">See bill prediction + energy-saving tips</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Prediction Form ──────────────────────────────────────────── -->
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+
+        <div class="card shadow-lg border-0 rounded-4 overflow-hidden">
+          <div class="card-header-custom">
+            <h4 class="mb-0 fw-bold">
+              <i class="fa-solid fa-calculator me-2"></i>Electricity Bill Calculator
+            </h4>
+            <p class="mb-0 opacity-75 small mt-1">All fields are required unless stated otherwise</p>
+          </div>
+
+          <div class="card-body p-4 p-lg-5">
+            <form id="predictForm" action="{{ url_for('predict') }}" method="POST" novalidate>
+
+              <!-- ── Personal Info ──────────────────── -->
+              <div class="form-section mb-4">
+                <h5 class="section-title">
+                  <span class="section-icon"><i class="fa-solid fa-user"></i></span>
+                  Household Info
+                </h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="name" class="form-label fw-medium">Your Name</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-user text-muted"></i></span>
+                      <input type="text" class="form-control" id="name" name="name"
+                             placeholder="e.g. Ravi Kumar" maxlength="60" />
+                    </div>
+                    <div class="invalid-msg" id="nameError">Please enter your name.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="members" class="form-label fw-medium">
+                      Family Members <span class="text-muted fw-normal">(people in household)</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-users text-muted"></i></span>
+                      <input type="number" class="form-control" id="members" name="members"
+                             min="1" max="12" placeholder="e.g. 4" />
+                    </div>
+                    <div class="invalid-msg" id="membersError">Enter a value between 1 and 12.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="season" class="form-label fw-medium">Current Season</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-cloud-sun text-muted"></i></span>
+                      <select class="form-select" id="season" name="season">
+                        <option value="">-- Select Season --</option>
+                        <option value="summer">☀️ Summer (Mar – Jun)</option>
+                        <option value="monsoon">🌧️ Monsoon (Jul – Oct)</option>
+                        <option value="winter">❄️ Winter (Nov – Feb)</option>
+                      </select>
+                    </div>
+                    <div class="invalid-msg" id="seasonError">Please select a season.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Air Conditioning ──────────────── -->
+              <div class="form-section mb-4">
+                <h5 class="section-title">
+                  <span class="section-icon"><i class="fa-solid fa-wind"></i></span>
+                  Air Conditioning
+                </h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="ac_units" class="form-label fw-medium">Number of ACs</label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-snowflake text-muted"></i></span>
+                      <select class="form-select" id="ac_units" name="ac_units">
+                        <option value="0">0 — No AC</option>
+                        <option value="1">1 AC</option>
+                        <option value="2">2 ACs</option>
+                        <option value="3">3 ACs</option>
+                        <option value="4">4 ACs</option>
+                      </select>
+                    </div>
+                  </div>
+                  <div class="col-md-6" id="acHoursGroup">
+                    <label for="ac_hours" class="form-label fw-medium">
+                      Average AC Usage <span class="text-muted fw-normal">(hrs/day)</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-clock text-muted"></i></span>
+                      <input type="number" class="form-control" id="ac_hours" name="ac_hours"
+                             min="0" max="24" step="0.5" value="0" placeholder="e.g. 8" />
+                    </div>
+                    <div class="invalid-msg" id="acHoursError">Enter hours between 0 and 24.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Other Appliances ──────────────── -->
+              <div class="form-section mb-4">
+                <h5 class="section-title">
+                  <span class="section-icon"><i class="fa-solid fa-plug"></i></span>
+                  Other Appliances
+                </h5>
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="fan_hours" class="form-label fw-medium">
+                      Fan Usage <span class="text-muted fw-normal">(avg hrs/day)</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-fan text-muted"></i></span>
+                      <input type="number" class="form-control" id="fan_hours" name="fan_hours"
+                             min="0" max="24" step="0.5" placeholder="e.g. 12" />
+                    </div>
+                    <div class="invalid-msg" id="fanError">Enter hours between 0 and 24.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="tv_hours" class="form-label fw-medium">
+                      TV / Entertainment <span class="text-muted fw-normal">(avg hrs/day)</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-tv text-muted"></i></span>
+                      <input type="number" class="form-control" id="tv_hours" name="tv_hours"
+                             min="0" max="20" step="0.5" placeholder="e.g. 4" />
+                    </div>
+                    <div class="invalid-msg" id="tvError">Enter hours between 0 and 20.</div>
+                  </div>
+                  <div class="col-md-6">
+                    <label class="form-label fw-medium">Refrigerator</label>
+                    <div class="d-flex gap-3 mt-1">
+                      <div class="form-check form-check-custom">
+                        <input class="form-check-input" type="radio" name="fridge" id="fridge_yes" value="1" checked />
+                        <label class="form-check-label" for="fridge_yes">
+                          <i class="fa-solid fa-check-circle text-success me-1"></i>Yes
+                        </label>
+                      </div>
+                      <div class="form-check form-check-custom">
+                        <input class="form-check-input" type="radio" name="fridge" id="fridge_no" value="0" />
+                        <label class="form-check-label" for="fridge_no">
+                          <i class="fa-solid fa-times-circle text-danger me-1"></i>No
+                        </label>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="washing_uses" class="form-label fw-medium">
+                      Washing Machine <span class="text-muted fw-normal">(uses per month)</span>
+                    </label>
+                    <div class="input-group">
+                      <span class="input-group-text bg-light"><i class="fa-solid fa-shirt text-muted"></i></span>
+                      <input type="number" class="form-control" id="washing_uses" name="washing_uses"
+                             min="0" max="60" placeholder="e.g. 12" />
+                    </div>
+                    <div class="invalid-msg" id="washingError">Enter a value between 0 and 60.</div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- ── Submit ──────────────────────────── -->
+              <div class="text-center mt-4">
+                <button type="submit" class="btn btn-predict btn-lg px-5 py-3" id="submitBtn">
+                  <i class="fa-solid fa-bolt me-2"></i>Predict My Bill
+                </button>
+                <p class="text-muted small mt-2 mb-0">
+                  <i class="fa-solid fa-shield-halved me-1"></i>
+                  Your data is stored locally and never shared.
+                </p>
+              </div>
+
+            </form>
+          </div><!-- /.card-body -->
+        </div><!-- /.card -->
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}

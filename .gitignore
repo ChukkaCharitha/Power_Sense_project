@@ -1,0 +1,11 @@
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+venv/
+.env
+powersense.db
+.DS_Store
+*.egg-info/
+dist/
+build/

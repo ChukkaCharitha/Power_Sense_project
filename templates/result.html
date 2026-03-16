@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}Your Results{% endblock %}
+
+{% block content %}
+
+<!-- ── Result Hero ──────────────────────────────────────────────── -->
+<section class="result-hero py-5">
+  <div class="container">
+    <div class="text-center text-white mb-4">
+      <h2 class="fw-bold display-6">
+        {{ level[2] }} Hi, <span class="text-warning">{{ data.name }}</span>! Here's your prediction.
+      </h2>
+      <p class="text-light opacity-75">
+        Based on your inputs for <strong>{{ data.season | capitalize }}</strong> season
+        with <strong>{{ data.members }}</strong> family members.
+      </p>
+    </div>
+
+    <!-- ── Score Cards ──────────── -->
+    <div class="row justify-content-center g-4">
+      <div class="col-md-5">
+        <div class="result-card text-center p-4 rounded-4 shadow">
+          <div class="result-icon mb-3">
+            <i class="fa-solid fa-gauge-high fa-2x text-warning"></i>
+          </div>
+          <p class="text-muted mb-1 fw-medium">Estimated Monthly Units</p>
+          <h1 class="result-value fw-bold text-dark">
+            {{ "%.1f" | format(data.pred_units) }}
+            <small class="fs-4 fw-normal text-muted">kWh</small>
+          </h1>
+          <span class="badge badge-level-{{ level[1] }} px-3 py-2 fs-6 mt-2">
+            {{ level[2] }} {{ level[0] }} Consumption
+          </span>
+        </div>
+      </div>
+
+      <div class="col-md-5">
+        <div class="result-card result-bill text-center p-4 rounded-4 shadow">
+          <div class="result-icon mb-3">
+            <i class="fa-solid fa-indian-rupee-sign fa-2x text-success"></i>
+          </div>
+          <p class="text-muted mb-1 fw-medium">Estimated Monthly Bill</p>
+          <h1 class="result-value fw-bold text-dark">
+            ₹{{ "%.0f" | format(data.pred_bill) }}
+          </h1>
+          <p class="text-muted small mt-2 mb-0">
+            As per TSSPDCL LT-I domestic tariff slabs
+          </p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── Breakdown + Tips ─────────────────────────────────────────── -->
+<section class="py-5 bg-light">
+  <div class="container">
+    <div class="row g-4">
+
+      <!-- Pie Chart -->
+      <div class="col-lg-5">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-1">
+              <i class="fa-solid fa-chart-pie text-warning me-2"></i>Appliance-wise Breakdown
+            </h5>
+            <p class="text-muted small mb-3">Estimated monthly consumption per appliance (kWh)</p>
+            <div class="chart-container">
+              <canvas id="breakdownChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tips -->
+      <div class="col-lg-7">
+        <div class="card border-0 shadow-sm rounded-4 h-100">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-1">
+              <i class="fa-solid fa-lightbulb text-warning me-2"></i>Energy-Saving Tips for You
+            </h5>
+            <p class="text-muted small mb-3">Personalised based on your usage pattern</p>
+            <div class="tips-list">
+              {% for icon, tip in tips %}
+                <div class="tip-item d-flex align-items-start gap-3 mb-3 p-3 rounded-3">
+                  <span class="tip-icon flex-shrink-0">{{ icon }}</span>
+                  <p class="mb-0 text-dark small lh-base">{{ tip }}</p>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<!-- ── Input Summary ────────────────────────────────────────────── -->
+<section class="py-5">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-9">
+        <div class="card border-0 shadow-sm rounded-4">
+          <div class="card-body p-4">
+            <h5 class="fw-bold mb-3">
+              <i class="fa-solid fa-list-check text-warning me-2"></i>Your Input Summary
+            </h5>
+            <div class="row g-3">
+              <div class="col-6 col-md-3">
+                <div class="summary-item text-center p-3 rounded-3">
+                  <i class="fa-solid fa-users fa-lg text-primary mb-2"></i>
+                  <p class="mb-0 small text-muted">Members</p>
+                  <p class="mb-0 fw-bold fs-5">{{ data.members }}</p>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="summary-item text-center p-3 rounded-3">
+                  <i class="fa-solid fa-snowflake fa-lg text-info mb-2"></i>
+                  <p class="mb-0 small text-muted">ACs / Hrs</p>
+                  <p class="mb-0 fw-bold fs-5">{{ data.ac_units }} / {{ data.ac_hours }}h</p>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="summary-item text-center p-3 rounded-3">
+                  <i class="fa-solid fa-fan fa-lg text-success mb-2"></i>
+                  <p class="mb-0 small text-muted">Fan Hrs</p>
+                  <p class="mb-0 fw-bold fs-5">{{ data.fan_hours }}h</p>
+                </div>
+              </div>
+              <div class="col-6 col-md-3">
+                <div class="summary-item text-center p-3 rounded-3">
+                  <i class="fa-solid fa-cloud-sun fa-lg text-warning mb-2"></i>
+                  <p class="mb-0 small text-muted">Season</p>
+                  <p class="mb-0 fw-bold fs-5">{{ data.season | capitalize }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Action Buttons -->
+        <div class="d-flex flex-wrap gap-3 justify-content-center mt-4">
+          <a href="{{ url_for('index') }}" class="btn btn-predict btn-lg px-4">
+            <i class="fa-solid fa-rotate-left me-2"></i>New Prediction
+          </a>
+          <a href="{{ url_for('history') }}" class="btn btn-outline-secondary btn-lg px-4">
+            <i class="fa-solid fa-clock-rotate-left me-2"></i>View History
+          </a>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</section>
+
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // ── Pie Chart (Chart.js) ──────────────────────────────────────
+  const labels = {{ breakdown.keys() | list | tojson }};
+  const values = {{ breakdown.values() | list | tojson }};
+  const colors = [
+    '#f59e0b', '#3b82f6', '#10b981', '#6366f1', '#f43f5e', '#a3e635', '#94a3b8'
+  ];
+
+  const ctx = document.getElementById('breakdownChart').getContext('2d');
+  new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: labels,
+      datasets: [{
+        data: values,
+        backgroundColor: colors,
+        borderWidth: 2,
+        borderColor: '#fff',
+        hoverOffset: 8,
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: true,
+      plugins: {
+        legend: {
+          position: 'bottom',
+          labels: {
+            padding: 14,
+            font: { size: 12 },
+            usePointStyle: true,
+          }
+        },
+        tooltip: {
+          callbacks: {
+            label: ctx => ` ${ctx.label}: ${ctx.parsed} kWh`
+          }
+        }
+      },
+      cutout: '60%',
+    }
+  });
+</script>
+{% endblock %}
