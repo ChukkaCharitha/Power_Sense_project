@@ -9,3 +9,4 @@ powersense.db
 *.egg-info/
 dist/
 build/
+model/model.pkl
