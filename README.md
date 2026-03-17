@@ -130,12 +130,6 @@ Optional Deployment (Render)
 5. Set **Start Command**: `gunicorn app:app`
 6. Add `gunicorn` to `requirements.txt`
 
- Screenshots
-
-| Home Page | Result Page | History Page |
-|-----------|-------------|--------------|
-| *(add screenshot)* | *(add screenshot)* | *(add screenshot)* |
-
  Author
 
 Built as a Full-Stack Development Internal Project.  
