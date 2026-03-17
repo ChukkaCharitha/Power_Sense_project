@@ -1,24 +1,20 @@
-# ⚡ PowerSense — Smart Electricity Bill & Consumption Predictor
+PowerSense — Smart Electricity Bill & Consumption Predictor
 
-> An AI-powered Full-Stack Web Application built with **Flask**, **Machine Learning (Scikit-learn)**, **Bootstrap 5**, and **jQuery** — predicts your monthly electricity bill based on your household appliance usage.
+ An AI-powered Full-Stack Web Application built with **Flask**, **Machine Learning (Scikit-learn)**, **Bootstrap 5**, and **jQuery** — predicts your monthly electricity bill based on your household appliance usage.
 
----
-
-## 📌 Project Overview
+Project Overview
 
 **PowerSense** is a smart electricity bill predictor that uses a trained **Random Forest Regression** machine learning model to estimate:
 
-- 🔢 **Monthly units consumed** (kWh)
-- 💰 **Monthly electricity bill** (₹) — based on **TSSPDCL Telangana domestic tariff slabs**
+Monthly units consumed** (kWh)
+Monthly electricity bill** (₹) — based on **TSSPDCL Telangana domestic tariff slabs**
 
 It also provides:
-- 🥧 **Appliance-wise consumption breakdown** (interactive pie chart)
-- 📊 **Prediction history** with comparison bar chart
-- 💡 **Personalised energy-saving tips** based on your usage pattern
+Appliance-wise consumption breakdown** (interactive pie chart)
+Prediction history** with comparison bar chart
+Personalised energy-saving tips** based on your usage pattern
 
----
-
-## 🛠️ Technologies Used
+Technologies Used
 
 | Layer       | Technology                        |
 |-------------|-----------------------------------|
@@ -30,11 +26,9 @@ It also provides:
 | Database    | SQLite (via Python sqlite3)       |
 | Templating  | Jinja2                            |
 
----
+Project Structure
 
-## 🗂️ Project Structure
 
-```
 PowerSense/
 ├── app.py                  # Flask main application
 ├── requirements.txt        # Python dependencies
@@ -59,57 +53,31 @@ PowerSense/
     ├── js/
     │   └── script.js       # jQuery validations & UI effects
     └── images/             # (add logo/screenshots here)
-```
 
----
+Setup & Installation
 
-## ⚙️ Setup & Installation
-
-### Prerequisites
+Prerequisites
 - Python 3.10+
 - pip
 
-### Step 1 — Clone / Download the project
-```bash
+Step 1 — Clone / Download the project
 git clone https://github.com/YOUR_USERNAME/PowerSense.git
 cd PowerSense
-```
-
-### Step 2 — Create a virtual environment (recommended)
-```bash
+Step 2 — Create a virtual environment (recommended)
 python -m venv venv
-
-# Windows
 venv\Scripts\activate
-
-# macOS / Linux
-source venv/bin/activate
-```
-
-### Step 3 — Install dependencies
-```bash
+Step 3 — Install dependencies
 pip install -r requirements.txt
-```
-
-### Step 4 — Train the ML model (run once)
-```bash
+Step 4 — Train the ML model (run once)
 python model/train_model.py
-```
+
 This generates `model/model.pkl` with **~96.6% accuracy (R²)**.
-
-### Step 5 — Run the Flask app
-```bash
+Step 5 — Run the Flask app
 python app.py
-```
-
-### Step 6 — Open in browser
-```
+Step 6 — Open in browser
 http://127.0.0.1:5000
-```
 
----
-
-## 🤖 ML Model Details
+ML Model Details
 
 | Property        | Value                           |
 |-----------------|---------------------------------|
@@ -121,7 +89,7 @@ http://127.0.0.1:5000
 | Bill R²         | **0.965**                       |
 | Tariff basis    | TSSPDCL LT-I (Telangana) 2024   |
 
-### Tariff Slabs Used (TSSPDCL Domestic):
+Tariff Slabs Used (TSSPDCL Domestic):
 | Units           | Rate (₹/unit) |
 |-----------------|----------------|
 | 0 – 50          | ₹1.45         |
@@ -132,9 +100,7 @@ http://127.0.0.1:5000
 | 400+            | ₹8.50         |
 | Fixed charge    | ₹50/month     |
 
----
-
-## 🌐 Pages & Routes
+Pages & Routes
 
 | Route              | Page              | Description                        |
 |--------------------|-------------------|------------------------------------|
@@ -144,22 +110,18 @@ http://127.0.0.1:5000
 | `GET /history`     | History           | Table of past predictions          |
 | `POST /delete/<id>`| —                 | Deletes a prediction record        |
 
----
+Features
 
-## 🔒 Features
+ **Server-side validation** in Flask
+ **Client-side validation** with jQuery (empty fields, range checks)
+ **SQLite database** — stores every prediction with timestamp
+ **Jinja2 templating** — for-loops, conditionals, variable injection
+ **Flash messages** — user feedback for errors and success
+ **Responsive design** — works on mobile and desktop
+ **Interactive Charts** — doughnut (breakdown) + bar (history comparison)
+ **Energy-saving tips** — personalised based on usage pattern
 
-- ✅ **Server-side validation** in Flask
-- ✅ **Client-side validation** with jQuery (empty fields, range checks)
-- ✅ **SQLite database** — stores every prediction with timestamp
-- ✅ **Jinja2 templating** — for-loops, conditionals, variable injection
-- ✅ **Flash messages** — user feedback for errors and success
-- ✅ **Responsive design** — works on mobile and desktop
-- ✅ **Interactive Charts** — doughnut (breakdown) + bar (history comparison)
-- ✅ **Energy-saving tips** — personalised based on usage pattern
-
----
-
-## 🚀 Optional Deployment (Render)
+Optional Deployment (Render)
 
 1. Push code to GitHub
 2. Go to [render.com](https://render.com) → New Web Service
@@ -168,23 +130,16 @@ http://127.0.0.1:5000
 5. Set **Start Command**: `gunicorn app:app`
 6. Add `gunicorn` to `requirements.txt`
 
----
-
-## 📸 Screenshots
+ Screenshots
 
 | Home Page | Result Page | History Page |
 |-----------|-------------|--------------|
 | *(add screenshot)* | *(add screenshot)* | *(add screenshot)* |
 
----
-
-## 👨‍💻 Author
+ Author
 
 Built as a Full-Stack Development Internal Project.  
 Technologies: Flask · Scikit-learn · Bootstrap 5 · jQuery · Chart.js · SQLite
-
----
-
-## 📄 License
+ License
 
 This project is for academic/educational use.
